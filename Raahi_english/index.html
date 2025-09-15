@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raahi AI - Hisar Travel Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        .chatbot-container {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-panel {
+            width: 300px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-section h3 {
+            color: #3494E6;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-section a {
+            color: #EC6EAD;
+            text-decoration: none;
+            display: block;
+            margin: 8px 0;
+            transition: color 0.3s;
+        }
+        
+        .info-section a:hover {
+            color: #b21f1f;
+            text-decoration: underline;
+        }
+        
+        .chat-header {
+            background: linear-gradient(to right, #3494E6, #EC6EAD);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .chat-messages {
+            height: 400px;
+            padding: 20px;
+            overflow-y: auto;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f9f9f9"/><path d="M0 0L100 100M100 0L0 100" stroke="%23f0f0f0" stroke-width="1"/></svg>');
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            display: flex;
+        }
+        
+        .user-message {
+            justify-content: flex-end;
+        }
+        
+        .bot-message {
+            justify-content: flex-start;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .user-message .message-content {
+            background: linear-gradient(to right, #3494E6, #EC6EAD);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message .message-content {
+            background-color: #f0f0f0;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3494E6;
+        }
+        
+        .info-card h3 {
+            color: #3494E6;
+            margin-bottom: 8px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-card p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        
+        .info-card a {
+            color: #EC6EAD;
+            text-decoration: none;
+        }
+        
+        .info-card a:hover {
+            text-decoration: underline;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .chat-input button {
+            background: linear-gradient(to right, #3494E6, #EC6EAD);
+            color: white;
+            border: none;
+            width: 50px;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+        }
+        
+        .feature-icon {
+            background: linear-gradient(to right, #3494E6, #EC6EAD);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 8px;
+            font-size: 18px;
+        }
+        
+        .feature p {
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            padding: 10px;
+            justify-content: center;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #999;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .hindi {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .info-panel {
+                width: 100%;
+                order: 2;
+            }
+            
+            .chatbot-container {
+                order: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chatbot-container">
+            <div class="chat-header">
+                <div class="language-selector" id="languageToggle">
+                    <i class="fas fa-language"></i> English
+                </div>
+                <h1>Raahi AI Assistant</h1>
+                <p>Your travel and safety companion in Hisar</p>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <div class="english">Namaste! I'm Raahi, your travel assistant in Hisar. How can I help you today?</div>
+                        <div class="hindi" style="display: none;">नमस्ते! मैं राही हूं, हिसार में आपकी यात्रा सहायक। आज मैं आपकी कैसे मदद कर सकता हूं?</div>
+                    </div>
+                </div>
+                
+                <div class="message user-message">
+                    <div class="message-content">
+                        <div class="english">What's the weather in Hisar?</div>
+                        <div class="hindi" style="display: none;">हिसार में मौसम कैसा है?</div>
+                    </div>
+                </div>
+                
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <div class="info-card">
+                            <h3><i class="fas fa-cloud-sun"></i> <span class="english">Hisar Weather</span><span class="hindi" style="display: none;">हिसार का मौसम</span></h3>
+                            <p><span class="english">Current: 32°C, Sunny</span><span class="hindi" style="display: none;">वर्तमान: 32°C, धूप</span></p>
+                            <p><span class="english">Forecast: 34°C Tomorrow</span><span class="hindi" style="display: none;">पूर्वानुमान: कल 34°C</span></p>
+                            <p><span class="english">Humidity: 45%</span><span class="hindi" style="display: none;">नमी: 45%</span></p>
+                            <p><span class="english">More info: <a href="https://weather.com" target="_blank">Weather.com</a></span><span class="hindi" style="display: none;">अधिक जानकारी: <a href="https://weather.com" target="_blank">Weather.com</a></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message user-message">
+                    <div class="message-content">
+                        <div class="english">How's the traffic in Hisar?</div>
+                        <div class="hindi" style="display: none;">हिसार में ट्रैफिक कैसा है?</div>
+                    </div>
+                </div>
+                
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <div class="info-card">
+                            <h3><i class="fas fa-traffic-light"></i> <span class="english">Hisar Traffic</span><span class="hindi" style="display: none;">हिसार यातायात</span></h3>
+                            <p><span class="english">Status: Moderate Traffic</span><span class="hindi" style="display: none;">स्थिति: मध्यम यातायात</span></p>
+                            <p><span class="english">Hotspots: Urban Estate, Bus Stand</span><span class="hindi" style="display: none;">व्यस्त इलाके: अर्बन एस्टेट, बस स्टैंड</span></p>
+                            <p><span class="english">Live updates: <a href="https://maps.google.com" target="_blank">Google Maps</a></span><span class="hindi" style="display: none;">लाइव अपडेट: <a href="https://maps.google.com" target="_blank">Google Maps</a></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message user-message">
+                    <div class="message-content">
+                        <div class="english">Show me tourist places in Hisar</div>
+                        <div class="hindi" style="display: none;">हिसार में पर्यटन स्थल दिखाएं</div>
+                    </div>
+                </div>
+                
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <div class="info-card">
+                            <h3><i class="fas fa-monument"></i> <span class="english">Hisar Tourist Spots</span><span class="hindi" style="display: none;">हिसार के पर्यटन स्थल</span></h3>
+                            <p>• <a href="https://www.tripadvisor.com" target="_blank">Firoz Shah Palace Complex</a></p>
+                            <p>• <a href="https://www.tripadvisor.com" target="_blank">Blue Bird Lake</a></p>
+                            <p>• <a href="https://www.tripadvisor.com" target="_blank">Deer Park</a></p>
+                            <p>• <a href="https://www.tripadvisor.com" target="_blank">Gujri Mahal</a></p>
+                            <p><span class="english">More info: <a href="https://haryana tourism.com" target="_blank">Haryana Tourism</a></span><span class="hindi" style="display: none;">अधिक जानकारी: <a href="https://haryana tourism.com" target="_blank">हरियाणा पर्यटन</a></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="message user-message">
+                    <div class="message-content">
+                        <div class="english">What about safety in Hisar?</div>
+                        <div class="hindi" style="display: none;">हिसार में सुरक्षा के बारे में क्या?</div>
+                    </div>
+                </div>
+                
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <div class="info-card">
+                            <h3><i class="fas fa-shield-alt"></i> <span class="english">Hisar Safety Information</span><span class="hindi" style="display: none;">हिसार सुरक्षा जानकारी</span></h3>
+                            <p><span class="english">Crime Rate: Low to Moderate</span><span class="hindi" style="display: none;">अपराध दर: कम से मध्यम</span></p>
+                            <p><span class="english">Emergency: <a href="tel:100">100 (Police)</a>, <a href="tel:108">108 (Ambulance)</a></span><span class="hindi" style="display: none;">आपातकाल: <a href="tel:100">100 (पुलिस)</a>, <a href="tel:108">108 (एम्बुलेंस)</a></span></p>
+                            <p><span class="english">Women's Safety: <a href="tel:1091">1091</a></span><span class="hindi" style="display: none;">महिला सुरक्षा: <a href="tel:1091">1091</a></span></p>
+                            <p><span class="english">Local Police: <a href="https://haryanapolice.gov.in" target="_blank">Haryana Police</a></span><span class="hindi" style="display: none;">स्थानीय पुलिस: <a href="https://haryanapolice.gov.in" target="_blank">हरियाणा पुलिस</a></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+            
+            <div class="features">
+                <div class="feature" onclick="askWeather()">
+                    <div class="feature-icon"><i class="fas fa-cloud-sun"></i></div>
+                    <p><span class="english">Weather</span><span class="hindi" style="display: none;">मौसम</span></p>
+                </div>
+                <div class="feature" onclick="askTraffic()">
+                    <div class="feature-icon"><i class="fas fa-traffic-light"></i></div>
+                    <p><span class="english">Traffic</span><span class="hindi" style="display: none;">यातायात</span></p>
+                </div>
+                <div class="feature" onclick="askTourism()">
+                    <div class="feature-icon"><i class="fas fa-monument"></i></div>
+                    <p><span class="english">Tourist Info</span
